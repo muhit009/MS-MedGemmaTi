@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(cmd /c \"taskkill /PID 26272 /F & taskkill /PID 24580 /F & taskkill /PID 4004 /F & taskkill /PID 23244 /F & taskkill /PID 16776 /F\")"
-    ]
-  }
-}
