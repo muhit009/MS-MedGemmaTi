@@ -1,0 +1,20 @@
+# Model server dependencies (separate from backend requirements)
+# Install with: pip install -r requirements-model.txt
+# Requires CUDA-capable GPU (tested on RTX 3060 Ti 8GB)
+
+# PyTorch with CUDA 12.x — install via:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+torch
+
+# Hugging Face ecosystem
+transformers>=4.57.0
+peft>=0.18.0
+accelerate
+huggingface_hub
+
+# 4-bit quantization
+bitsandbytes
+
+# API server
+fastapi
+uvicorn[standard]
