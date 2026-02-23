@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: medgemma-backend
+    env: python
+    region: oregon
+    rootDir: medgemma-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    plan: free
+    envVars:
+      # App settings
+      - key: DEBUG
+        value: "False"
+      - key: APP_NAME
+        value: "MedGemma Clinical Suite API"
+      - key: APP_VERSION
+        value: "1.0.0"
+
+      # CORS — update with your actual Vercel URL after deploying the frontend
+      - key: CORS_ORIGINS
+        value: '["https://YOUR_APP.vercel.app", "http://localhost:3000"]'
+
+      # Supabase — set these manually in the Render dashboard
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+
+      # JWT Auth — set a strong secret in the Render dashboard
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+
+      # RunPod — set these manually in the Render dashboard
+      - key: RUNPOD_ENDPOINT_ID
+        sync: false
+      - key: RUNPOD_API_KEY
+        sync: false
+
+      # Storage
+      - key: STORAGE_BUCKET
+        value: "medical-images"
