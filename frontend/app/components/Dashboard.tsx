@@ -245,7 +245,7 @@ const Dashboard = () => {
           updatedAt: new Date().toISOString(),
         };
         setNotes((prev) => [fakeNote, ...prev]);
-      } else if (editingNote && editingNote !== 'new') {
+      } else if (editingNote) {
         setNotes((prev) => prev.map((n) => n.id === editingNote.id ? { ...n, content: noteEditorContent, updatedAt: new Date().toISOString() } : n));
       }
     } else {
