@@ -60,6 +60,15 @@ interface Message {
 // On reload, loadPatientData() fetches fresh seed data from Supabase.
 const DEMO_PATIENT_IDS = new Set(['13011', '16997', '17523', '24163', '40207', '44669']);
 
+const DEMO_PATIENTS = [
+  { id: '17523', label: 'Dangerous Miss ★', desc: 'Base: STABLE · TI: WORSENED' },
+  { id: '13011', label: 'Multi-Study Progression', desc: '3+ sequential scans, trajectory variety' },
+  { id: '16997', label: 'Improvement Tracking', desc: 'Clear recovery arc across studies' },
+  { id: '24163', label: 'Mixed Assessment', desc: 'Simultaneous regional changes' },
+  { id: '40207', label: 'False Alarm Prevention', desc: 'TI avoids base model over-call' },
+  { id: '44669', label: 'Hallucination Showcase', desc: 'Base model: anatomical nonsense' },
+] as const;
+
 const Dashboard = () => {
   const { user, logout } = useAuth();
 
@@ -125,6 +134,9 @@ const Dashboard = () => {
   // Tutorial overlay
   const [showTutorial, setShowTutorial] = useState(true);
 
+  // Demo patient quick-load
+  const [loadingDemoId, setLoadingDemoId] = useState<string | null>(null);
+
   // Derived effective mode (not state — recalculated on render)
   const effectiveMode: 'analysis' | 'discussion' =
     lockedMode ?? (messages.length === 0 ? 'analysis' : 'discussion');
@@ -178,6 +190,19 @@ const Dashboard = () => {
       getPatient(savedId).then(p => setPatient(p)).catch(() => localStorage.removeItem('selectedPatientId'));
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Demo patient quick-load ──────────────────────────────────
+  const handleDemoPatientSelect = async (id: string) => {
+    setLoadingDemoId(id);
+    try {
+      const p = await getPatient(id);
+      handlePatientSelect(p);
+    } catch {
+      // patient missing from DB — fail silently
+    } finally {
+      setLoadingDemoId(null);
+    }
+  };
 
   // ─── Patient selection ────────────────────────────────────────
   const handlePatientSelect = (selectedPatient: PatientResponse) => {
@@ -245,7 +270,7 @@ const Dashboard = () => {
           updatedAt: new Date().toISOString(),
         };
         setNotes((prev) => [fakeNote, ...prev]);
-      } else if (editingNote) {
+      } else if (editingNote && editingNote !== 'new') {
         setNotes((prev) => prev.map((n) => n.id === editingNote.id ? { ...n, content: noteEditorContent, updatedAt: new Date().toISOString() } : n));
       }
     } else {
@@ -599,10 +624,45 @@ const Dashboard = () => {
                 Find Patient
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Select Patient</DialogTitle>
               </DialogHeader>
+
+              {/* Demo patient quick-access */}
+              <div className="space-y-2 pt-1">
+                <p className="text-[10px] uppercase font-semibold tracking-widest text-muted-foreground">
+                  Demo Patients
+                </p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {DEMO_PATIENTS.map(dp => (
+                    <button
+                      key={dp.id}
+                      onClick={() => handleDemoPatientSelect(dp.id)}
+                      disabled={!!loadingDemoId}
+                      className="relative text-left p-2.5 rounded-md border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors space-y-0.5 disabled:opacity-50"
+                    >
+                      {loadingDemoId === dp.id && (
+                        <Loader2 className="absolute top-2 right-2 h-3 w-3 animate-spin text-primary" />
+                      )}
+                      <div className="font-mono text-[10px] text-primary/70">#{dp.id}</div>
+                      <div className="text-xs font-medium leading-tight">{dp.label}</div>
+                      <div className="text-[10px] text-muted-foreground leading-tight">{dp.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="relative my-1">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-background px-2 text-[10px] text-muted-foreground">or search</span>
+                </div>
+              </div>
+
               <PatientSelection onPatientSelect={handlePatientSelect} />
             </DialogContent>
           </Dialog>

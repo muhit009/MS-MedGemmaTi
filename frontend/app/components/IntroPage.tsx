@@ -76,11 +76,17 @@ export default function IntroPage({ onStaffLogin }: IntroPageProps) {
             <li className="flex gap-2">
               <span className="text-amber-500 shrink-0">⚠</span>
               <span>
-                First response may take ~1 minute — model is hosted cost-effectively on serverless GPU.
+                <strong>Backend cold start:</strong> first page load may take ~30s while the API server wakes up.
               </span>
             </li>
             <li className="flex gap-2">
-              <span className="text-primary shrink-0 font-medium">5.</span>
+              <span className="text-amber-500 shrink-0">⚠</span>
+              <span>
+                <strong>Model cold start:</strong> first AI response may take ~1 minute — the model runs on a serverless GPU to minimize cost.
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-primary shrink-0 font-medium">4.</span>
               <span>Browse existing demo patients or create a new one to try your own queries.</span>
             </li>
           </ul>
